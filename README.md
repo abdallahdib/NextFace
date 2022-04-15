@@ -1,7 +1,7 @@
 # NextFace
 NextFace is a light-weight pytorch library for high-fidelity 3D face reconstruction from monocular image(s) where scene attributes –3D geometry, reflectance (diffuse, specular and roughness), pose, camera parameters, and scene illumination– are estimated. It is first-order optimization method that uses pytorch autograd engine and ray tracing to fit a statistical morphable model to an input image(s).
 <p align="center">
-<img src="resources/visual.png" >
+<img src="resources/visual.jpg" >
 </p>
 
 # Features: 
