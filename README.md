@@ -1,8 +1,8 @@
 # NextFace
 NextFace is a light-weight pytorch library for high-fidelity 3D face reconstruction from monocular image(s) where scene attributes –3D geometry, reflectance (diffuse, specular and roughness), pose, camera parameters, and scene illumination– are estimated. It is a first-order optimization method that uses pytorch autograd engine and ray tracing to fit a statistical morphable model to an input image(s).
 <p align="center">
+<img src="resources/emily.png" style="float: left; width: 24%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/emily.gif" style="float: left; width: 24%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/beard.png" style="float: left; width: 24%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/beard.gif" style="float: left; width: 24%; margin-right: 1%; margin-bottom: 0.5em;">
 <img src="resources/visual.jpg" >
-<img src="resources/emily.gif" style="float: left; width: 30%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/emily.gif" style="float: left; width: 30%; margin-right: 1%; margin-bottom: 0.5em;">
 </p>
 
 # Features: 
@@ -51,7 +51,8 @@ NextFace reprocudes the optimizatin strategy of our [early work](https://arxiv.o
 * **stage 1**: or coarse stage, where face expression and head pose are estimated by minimizing the landmarks loss between the 2d landmarks and their corresponding face vertices. this produces a good starting point for the next optimization stage
 * **stage 2**: the face shape identity/expression,  statistical diffuse and specular albedos, head pose and scene light are estimated by minimizing the photo consistency loss between the ray traced image and the real one.
 * **stage 3**: to improve the statistical albedos estimated in the previous stage, the method optimizes, on per-pixel basis, the previously estimated albedos and try to capture more albedo details. Consistency, symmetry and smoothness regularizers (similar to [this work](https://arxiv.org/abs/2101.05356)) are used to avoid overfitting and add robustness against lighting conditions.  
-By default,  the method uses 9 order spherical harmonics bands (as in [this work](https://openaccess.thecvf.com/content/ICCV2021/papers/Dib_Towards_High_Fidelity_Monocular_Face_Reconstruction_With_Rich_Reflectance_Using_ICCV_2021_paper.pdf)) to capture scene light. you can modify the number of spherical harmonics bands  in **optimConfig.ini** bands and see the importance of using high number of bands for a better light recovery. 
+By default,  the method uses 9 order spherical harmonics bands (as in [this work](https://openaccess.thecvf.com/content/ICCV2021/papers/Dib_Towards_High_Fidelity_Monocular_Face_Reconstruction_With_Rich_Reflectance_Using_ICCV_2021_paper.pdf)) to capture scene light. you can modify the number of spherical harmonics bands  in **optimConfig.ini** bands and see the importance of using high number of bands for a better shadows recovery. 
+
 # Good practice for best reconstruction
 
 * To obtain best reconstruction with optimal albedos, ensure that the images are taken in good lighting conditions (no shadows and well lit...).
