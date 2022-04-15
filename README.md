@@ -1,19 +1,17 @@
 # NextFace
 NextFace is a light-weight pytorch library for high-fidelity 3D face reconstruction from monocular image(s) where scene attributes –3D geometry, reflectance (diffuse, specular and roughness), pose, camera parameters, and scene illumination– are estimated. It is first-order optimization method that uses pytorch autograd engine and ray tracing to fit a statistical morphable model to an input image(s).
+<p align="center">
+<img src="resources/visual.png" >
+</p>
 
 # Features: 
-* reconstructs face at high fidelity from single or mutliple RGB images
-* estimates face geometry 
-* estimates detailed face refelctance (diffuse, specular and roughness) 
-* estimates scene light with spherical harmonics
-* estimates head pose and orientation
-* runs on both cpu  cuda-enabled gpu
+* Reconstructs face at high fidelity from single or mutliple RGB images
+* Estimates face geometry 
+* Estimates detailed face refelctance (diffuse, specular and roughness) 
+* Estimates scene light with spherical harmonics
+* Estimates head pose and orientation
+* Runs on both cpu and   cuda-enabled gpu
 
-# Dependencies
-* pytorch >= 1.3.1 used for optimization
-* redner used for ray tracing 
-* face_alignment used for landmarks detection
-* basel morphable model 2017 used as the statistical morphable face model
 
 # Installation
 * Clone the repository 
@@ -41,12 +39,7 @@ NextFace is a light-weight pytorch library for high-fidelity 3D face reconstruct
 
 # Output 
 The optimization takes 4~5 minutes depending on your gpu performance. The output of the optimization is the following:
-* finalReconstruction_{imageIndex}.png: the final reconstruction of the image  
-* overlay_{imageIndex}.png: overlay of the final reconstruction on top of the input image
-* illumination_{imageIndex}.png: the recovered illumination of the scene
-* diffuse_{imageIndex}.png: the estimated diffuse map projected on the face 
-*  specular_{imageIndex}.png: the estimated roughness map projected on the face 
-* roughness_{imageIndex}.png: the estimated roughness map projected on the face 
+* render_{imageIndex}.png: contains from left to right: input image, overlay of the final reconstruction on the input image, the final reconstruction, diffuse, specular and roughness projected on the face. 
 * diffuseMap_{imageIndex}.png: the estimated diffuse map in uv space
 * specularMap_{imageIndex}.png: the estimated specular map in uv space
 * roughnessMap_{imageIndex}.png: the estimated roughness map in uv space
@@ -60,7 +53,7 @@ NextFace reprocudes the optimizatin strategy of our [early work](https://arxiv.o
 By default,  the method uses 9 order spherical harmonics bands ([this work](https://openaccess.thecvf.com/content/ICCV2021/papers/Dib_Towards_High_Fidelity_Monocular_Face_Reconstruction_With_Rich_Reflectance_Using_ICCV_2021_paper.pdf)) to capture scene light. you can modify the number of spherical harmonics bands  in **optimConfig.ini** bands and see the importance of using high number of bands for a better light recovery. 
 # Good practice for best reconstruction
 
-* To obtain best reconstruction with optimal albedos, ensure that the images are taken in good lighting conditions (no shadows, well lit...).
+* To obtain best reconstruction with optimal albedos, ensure that the images are taken in good lighting conditions (no shadows and well lit...).
 * In case of single input image, ensure that the face is frontal to reconstructs a complete diffuse/specular/roughness, as the method recover only visible parts of the face. 
 * Avoid extreme face expressions as the underlying model may fail to recover them. 
 # Limitations 
@@ -73,20 +66,22 @@ Below are the values to modify:
 	* for specular map: *weightSpecularSymmetryReg*, *weightSpecularConsistencyReg*
 	* for roughness map: *weightRoughnessSymmetryReg* and *weightRoughnessConsistencyReg*
 I also provided a configuration file named **optimConfigLight.ini** which have higher regularization values for these maps that u can use
- viez dependnt attributes
+* Using a single image to estimate face attribute is an ill-posed problem and the estimated reflectance maps(diffuse, specular and roughness) and view and camera dependent. if you to obtain more intrinsic reflectance maps, you have to use multiple images per subject.
+
 # Roadmap
 If I have time:
-* Add virtual lightstage as proposed in [this]() to model high frequency point light)
-* Add support for [FLAME](https://github.com/Rubikplayer/flame-fitting) morphable model. You are welcome if you can help with this. 
+* Add virtual lightstage as proposed in [this]() to model high frequency point lights.
+* Add support for [FLAME](https://github.com/Rubikplayer/flame-fitting) morphable model. You are welcome if you can help. 
+* add GUI interface for loading images, landmarks edition, run optimization and visualize results.
  
 # License
 NextFace is available for free, under GPL license, to use for research and educational purposes only.
 
 # Acknowledgements
-The uvmap is taken from [here](https://github.com/unibas-gravis/parametric-face-image-generator/blob/master/data/regions/face12.json), landmarks association  from [here](https://github.com/kimoktm/Face2face/blob/master/data/custom_mapping.txt). [redner](https://github.com/BachiLi/redner/) is used for ray tracing.
+The uvmap is taken from [here](https://github.com/unibas-gravis/parametric-face-image-generator/blob/master/data/regions/face12.json), landmarks association  from [here](https://github.com/kimoktm/Face2face/blob/master/data/custom_mapping.txt). [redner](https://github.com/BachiLi/redner/) is used for ray tracing, albedo model from [here](https://github.com/waps101/AlbedoMM/).
 
 # Citation 
-NextFace inherits a lots of concepts from our early work below. if you use NextFace, please cite the following paper:
+If you use NextFace and find it useful in your work, plz cite the following work:
 
 ```
 @inproceedings{dib2021practical,
