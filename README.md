@@ -72,7 +72,7 @@ I also provided a configuration file named **optimConfigLight.ini** which have h
 
 # Roadmap
 If I have time:
-* Add virtual lightstage as proposed in [this]() to model high frequency point lights.
+* Add virtual lightstage as proposed in [this](https://arxiv.org/abs/2101.05356) to model high frequency point lights.
 * Add support for [FLAME](https://github.com/Rubikplayer/flame-fitting) morphable model. You are welcome if you can help. 
 * add GUI interface for loading images, landmarks edition, run optimization and visualize results.
  
