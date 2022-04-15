@@ -18,7 +18,7 @@ NextFace is a light-weight pytorch library for high-fidelity 3D face reconstruct
 * Clone the repository 
 * Create a new: conda env create -f environment.yml
 * Activate the environment: conda activate nextFace
-* Download basel face model from here (https://faces.dmi.unibas.ch/bfm/bfm2017.html), just fill the form and you will receive an instant direct download link in your inbox. Downloaded  model2017-1_face12_nomouth.h5 file and put it inside ./baselMorphableModel 
+* Download basel face model from here (https://faces.dmi.unibas.ch/bfm/bfm2017.html), just fill the form and you will receive an instant direct download link in your inbox. Downloaded  **model2017-1_face12_nomouth.h5 file** and put it inside **./baselMorphableModel** directory
 
 
 # How to use
