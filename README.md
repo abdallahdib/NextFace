@@ -72,9 +72,10 @@ I also provided a configuration file named **optimConfigLight.ini** which have h
 
 # Roadmap
 If I have time:
+* Expression tracking from video by optimizating head pose and expression on per-frame basis, which is straightforward once you have estimated the intrinsic face parameters(reflectance and geometry). I did not implement it yet simply, because i am running an old gpu (GTX 970M). I may add this feature when I buy an RTX.
 * Add virtual lightstage as proposed in [this](https://arxiv.org/abs/2101.05356) to model high frequency point lights.
 * Add support for [FLAME](https://github.com/Rubikplayer/flame-fitting) morphable model. You are welcome if you can help. 
-* add GUI interface for loading images, landmarks edition, run optimization and visualize results.
+* Add GUI interface for loading images, landmarks edition, run optimization and visualize results.
  
 # License
 NextFace is available for free, under GPL license, to use for research and educational purposes only. Please check LICENSE file.
