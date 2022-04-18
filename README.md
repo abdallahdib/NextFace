@@ -68,12 +68,12 @@ Below are the values to modify:
 	* for diffuse map: *weightDiffuseSymmetryReg* and *weightDiffuseConsistencyReg*, 
 	* for specular map: *weightSpecularSymmetryReg*, *weightSpecularConsistencyReg*
 	* for roughness map: *weightRoughnessSymmetryReg* and *weightRoughnessConsistencyReg*
-I also provided a configuration file named **optimConfigShadows.ini** which have higher regularization values for these maps that u can use.
+I also provided a configuration file named **optimConfigShadows.ini** which have higher values for these regularizers that u can try.
 * Using a single image to estimate face attribute is an ill-posed problem and the estimated reflectance maps(diffuse, specular and roughness) are view/camera dependent. To obtain intrinsic reflectance maps, you have to use multiple images per subject.
 
 # Roadmap
 If I have time:
-* Expression tracking from video by optimizating head pose and expression on per-frame basis, which is straightforward once you have estimated the intrinsic face parameters(reflectance and geometry). I did not implement it yet simply, because i am running an old gpu (GTX 970M). I may add this feature when I buy an RTX.
+* Expression tracking from video by optimizating head pose and expression on per-frame basis, which is straightforward once you have estimated the intrinsic face parameters(reflectance and geometry). I did not implement it yet simply, because i am running an old gpu (GTX 970M). I may add this feature when I decide to buy an RTX :)
 * Add virtual lightstage as proposed in [this](https://arxiv.org/abs/2101.05356) to model high frequency point lights.
 * Add support for [FLAME](https://github.com/Rubikplayer/flame-fitting) morphable model. You are welcome if you can help. 
 * Add GUI interface for loading images, landmarks edition, run optimization and visualize results.
