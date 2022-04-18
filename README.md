@@ -8,7 +8,7 @@ NextFace is a light-weight pytorch library for high-fidelity 3D face reconstruct
 # Features: 
 * Reconstructs face at high fidelity from single or mutliple RGB images
 * Estimates face geometry 
-* Estimates detailed face refelctance (diffuse, specular and roughness) 
+* Estimates detailed face reflectance (diffuse, specular and roughness) 
 * Estimates scene light with spherical harmonics
 * Estimates head pose and orientation
 * Runs on both cpu and cuda-enabled gpu
