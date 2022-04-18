@@ -68,7 +68,7 @@ Below are the values to modify:
 	* for diffuse map: *weightDiffuseSymmetryReg* and *weightDiffuseConsistencyReg*, 
 	* for specular map: *weightSpecularSymmetryReg*, *weightSpecularConsistencyReg*
 	* for roughness map: *weightRoughnessSymmetryReg* and *weightRoughnessConsistencyReg*
-I also provided a configuration file named **optimConfigShadows.ini** which have higher value for the diffuse symmetry regularizer that u can try.
+I also provided a configuration file named **optimConfigShadows.ini** which have higher values for these regularizers that u can try.
 * Using a single image to estimate face attribute is an ill-posed problem and the estimated reflectance maps(diffuse, specular and roughness) are view/camera dependent. To obtain intrinsic reflectance maps, you have to use multiple images per subject.
 
 # Roadmap
