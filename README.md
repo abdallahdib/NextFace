@@ -18,7 +18,8 @@ NextFace is a light-weight pytorch library for high-fidelity 3D face reconstruct
 * Clone the repository 
 * Execute the commands in 'INSTALL' file. these commands create a new conda environment called faceNext and install required packages. An 'environment.yml' is also provided. The library is tested with torch 1.3.1, torchvision 0.4.2 and cuda toolkit 10.1, but it should also work with recent pytorch versions.   
 * Activate the environment: conda activate nextFace
-* Download basel face model from here (https://faces.dmi.unibas.ch/bfm/bfm2017.html), just fill the form and you will receive an instant direct download link into your inbox. Downloaded  **model2017-1_face12_nomouth.h5 file** and put it inside **./baselMorphableModel** directory
+* Download basel face model from [here](https://faces.dmi.unibas.ch/bfm/bfm2017.html), just fill the form and you will receive an instant direct download link into your inbox. Downloaded  **model2017-1_face12_nomouth.h5 file** and put it inside **./baselMorphableModel** directory
+* Download the albedo face model **albedoModel2020_face12_albedoPart.h5** from [here](https://github.com/waps101/AlbedoMM/releases/download/v1.0/albedoModel2020_face12_albedoPart.h5) and put it inside **./baselMorphableModel** directory
 
 
 # How to use
