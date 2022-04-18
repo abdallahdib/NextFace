@@ -1,0 +1,7 @@
+conda create --name faceNext python=3.6.7
+conda activate faceNext
+conda install pytorch==1.3.1 torchvision==0.4.2 cudatoolkit=10.1 -c pytorch
+pip install redner-gpu
+conda install -c conda-forge opencv
+conda install -c 1adrianb face_alignment=1.2.0
+conda install -c anaconda h5py
