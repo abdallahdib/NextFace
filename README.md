@@ -1,3 +1,6 @@
+# News 
+* **20 April 2022**: replaced landmarks association file with a new one which gives better reconstruction results especially at face coutours. Plz pull
+
 # NextFace
 NextFace is a light-weight pytorch library for high-fidelity 3D face reconstruction from monocular image(s) where scene attributes –3D geometry, reflectance (diffuse, specular and roughness), pose, camera parameters, and scene illumination– are estimated. It is a first-order optimization method that uses pytorch autograd engine and ray tracing to fit a statistical morphable model to an input image(s).
 <p align="center">
