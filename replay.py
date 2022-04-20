@@ -40,7 +40,7 @@ if __name__ == "__main__":
     config = Config()
 
     configFile = params.config # './optimConfig.ini'
-    outputDir = params.output #'./replay/'
+    outputDir = params.output + '/' #'./replay/'
     parameters = params.input #'../workspace/exp/checkpoints/stage3_output.pickle'
 
     mkdir_p(outputDir)

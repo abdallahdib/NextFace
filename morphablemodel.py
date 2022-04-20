@@ -27,8 +27,9 @@ class MorphableModel:
         pathH5Model = path + '/model2017-1_face12_nomouth.h5'
         pathAlbedoModel = path + '/albedoModel2020_face12_albedoPart.h5'
         pathUV = path + '/uvParametrization.' + str(textureResolution) + '.pickle'
-        #pathLandmarks = path + '/landmark_68.txt'
-        pathLandmarks = path + '/landmark_54.txt'
+        #landmarks association file only 54 or 62 are available. 68 can improve
+        pathLandmarks = path + '/landmark_62.txt'
+        #pathLandmarks = path + '/landmark_54.txt'
         pathPickleFileName = path + '/morphableModel-2017.pickle'
         pathNormals = path + '/normals.pickle'
 
