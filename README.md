@@ -25,11 +25,15 @@ NextFace is a light-weight pytorch library for high-fidelity 3D face reconstruct
 
 
 # How to use
+
+## Reconstruction from a single image
 * to reconstruct a face from a single image: run the following command:
 	* **python optimizer.py --input *path-to-your-input-image* --output *output-path-where-to-save-results***
+## Reconstruction from multiple images (batch reconstruction)
 * In case you have multiple images with same resolution, u can run a batch optimization on these images. For this, put all ur images in the same directory and run the following command: 
 	 * **python optimizer.py --input *path-to-your-folder-that-contains-all-ur-images* --output *output-path-where-to-save-results***
-* if you have multiple images for the same person u can run the following command:
+## Reconstruction from mutliple images for the same person
+* if you have multiple images for the same person, put these images in the same folder and run the following command:
 	 * **python optimizer.py --sharedIdentity --input *path-to-your-folder-that-contains-all-ur-images* --output *output-path-where-to-save-results***
 
 	the **sharedIdentity** flag tells the optimizer that all images belong to the same person. In such case, the shape identity and face reflectance attributes are shared across all images. This generally produces  better face reflectance and geometry estimation. 
