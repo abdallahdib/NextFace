@@ -37,7 +37,7 @@ NextFace is a light-weight pytorch library for high-fidelity 3D face reconstruct
 	 * **python optimizer.py --sharedIdentity --input *path-to-your-folder-that-contains-all-ur-images* --output *output-path-where-to-save-results***
 
 	the **sharedIdentity** flag tells the optimizer that all images belong to the same person. In such case, the shape identity and face reflectance attributes are shared across all images. This generally produces  better face reflectance and geometry estimation. 
-	
+## Configuring NextFace
 * The file **optimConfig.ini** allows to control different aspect of NextFace such as:
 	* optimization (regularizations, number of iterations...)
 	* compute device (run on cpu or gpu)
