@@ -3,6 +3,7 @@ NextFace is a light-weight pytorch library for high-fidelity 3D face reconstruct
 <p align="center"><img src="resources/emily.png" style="float: left; width: 24%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/emily.gif" style="float: left; width: 24%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/beard.png" style="float: left; width: 24%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/beard.gif" style="float: left; width: 24%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/visual.jpg" ></p>
 
 # News 
+* **24 April 2022**: added a colab notebook from here: **demo.ipynb**
 * **20 April 2022**: I replaced landmarks association file with a new one which gives better reconstruction, especially on face coutours. Plz pull
 * **20 April 2022**: I tried NextFace on a challenging face and surprisingly we still get appealing reconstruction, check below:
 <p align="center"><img src="resources/results1.gif" style="float: left; width: 50%; margin-right: 1%; margin-bottom: 0.5em;"></p>
