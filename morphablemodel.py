@@ -39,7 +39,7 @@ class MorphableModel:
             if os.path.exists(pathH5Model) == False:
                 print('[Error] to use the library, you have to install basel morphable  face model 2017 from: https://faces.dmi.unibas.ch/bfm/bfm2017.html', file=sys.stderr, flush=True)
                 print('Fill the form on the link and you will get instant download link into your inbox.', file=sys.stderr, flush=True)
-                print('Download  "albedoModel2020_face12_albedoPart.h5" and put it inside ',path, ' and run again...', file=sys.stderr, flush=True)
+                print('Download  "model2017-1_face12_nomouth.h5" and put it inside ',path, ' and run again...', file=sys.stderr, flush=True)
                 exit(0)
 
             self.file = h5py.File(pathH5Model, 'r')
