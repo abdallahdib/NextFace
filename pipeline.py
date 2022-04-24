@@ -22,7 +22,7 @@ class Pipeline:
         self.renderer = Renderer(config.rtTrainingSamples, 1, self.device)
         self.uvMap = self.morphableModel.uvMap.clone()
         self.uvMap[:, 1] = 1.0 - self.uvMap[:, 1]
-        self.faces32 = self.morphableModel.faces.to(torch.int32)
+        self.faces32 = self.morphableModel.faces.to(torch.int32).contiguous()
         self.shBands = config.bands
         self.sharedIdentity = False
 
