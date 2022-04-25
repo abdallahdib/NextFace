@@ -19,7 +19,7 @@ class MorphableModel:
         :param trimPca: if True keep only a subset of the PCA basis
         :param device: where to store the morphableModel data (cpu or gpu)
         '''
-        assert textureResolution == 256 or textureResolution == 512 #can handle only 256 or 512 texture res
+        assert textureResolution == 256 or textureResolution == 512 or textureResolution == 1024 or textureResolution == 2048 #can handle only 256 or 512 texture res
         self.shapeBasisSize = 199
         self.albedoBasisSize = 145
         self.expBasisSize = 100
