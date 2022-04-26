@@ -368,6 +368,12 @@ class Optimizer:
                     self.pipeline.morphableModel.uvMap,
                     prefix + 'diffuseMap_' + str(self.getTextureIndex(i)) + '.png')
 
+            envMaps = self.pipeline.sh.toEnvMap(self.pipeline.vShCoeffs, self.config.smoothSh) #smooth
+            ext = '.png'
+            if self.config.saveExr:
+                ext = '.exr'
+            saveImage(envMaps[i], outputDir + '/envMap_' + str(i) + ext)
+
             #saveImage(diffuseAlbedo[self.getTextureIndex(i)],  outputDir + prefix +  'diffuse_' + str(self.getTextureIndex(i)) + '.png')
             #saveImage(specularAlbedo[self.getTextureIndex(i)], outputDir + prefix + 'specular_' + str(self.getTextureIndex(i)) + '.png')
             #saveImage(roughnessAlbedo[self.getTextureIndex(i)], outputDir + prefix + 'roughness_' + str(self.getTextureIndex(i)) + '.png')

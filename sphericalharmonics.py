@@ -70,23 +70,27 @@ class SphericalHarmonics:
             return math.sqrt(2.0) * self.normlizeSH(l, -m) * \
                    torch.sin(-m * phi) * self.associatedLegendrePolynomial(l, -m, torch.cos(theta))
 
-    def toEnvMap(self, shCoeffs):
+    def toEnvMap(self, shCoeffs, smooth = False):
         '''
         create an environment map from given sh coeffs
         :param shCoeffs: float tensor [n, bands * bands, 3]
+        :param smooth: if True, the first 3 bands are smoothed
         :return: environment map tensor [n, resX, resY, 3]
         '''
         assert(shCoeffs.dim() == 3 and shCoeffs.shape[-1] == 3)
         envMaps = torch.zeros( [shCoeffs.shape[0], self.resolution[0], self.resolution[1], 3]).to(shCoeffs.device)
         for i in range(shCoeffs.shape[0]):
-            envMap =self.constructEnvMapFromSHCoeffs(shCoeffs[i])
+            envMap =self.constructEnvMapFromSHCoeffs(shCoeffs[i], smooth)
             envMaps[i] = envMap
         return envMaps
-    def constructEnvMapFromSHCoeffs(self, shCoeffs):
+    def constructEnvMapFromSHCoeffs(self, shCoeffs, smooth = False):
 
         assert (isinstance(shCoeffs, torch.Tensor) and shCoeffs.dim() == 2 and shCoeffs.shape[1] == 3)
 
-        smoothed_coeffs =  shCoeffs.transpose(0, 1) #self.smoothSH(shCoeffs.transpose(0, 1), 4) #smooth the first three bands?
+        if smooth:
+            smoothed_coeffs = self.smoothSH(shCoeffs.transpose(0, 1), 4)
+        else:
+            smoothed_coeffs =  shCoeffs.transpose(0, 1) #self.smoothSH(shCoeffs.transpose(0, 1), 4) #smooth the first three bands?
 
         res = self.resolution
 

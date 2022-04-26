@@ -16,7 +16,7 @@ class Config:
 		self.bands = 9
 		self.envMapRes = 64
 		self.smoothSh = False
-
+		self.saveExr = True
 		#camera
 		self.camFocalLength = 500.0 #focal length in pixels (f =  f_{mm} * imageWidth / sensorWidth)
 		self.optimizeFocalLength = True #if True the initial focal length is estimated otherwise it remains constant
