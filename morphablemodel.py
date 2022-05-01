@@ -30,7 +30,7 @@ class MorphableModel:
         #landmarks association file only 54 or 62 are available. 68 can improve
         pathLandmarks = path + '/landmark_62.txt'
         #pathLandmarks = path + '/landmark_54.txt'
-        pathPickleFileName = path + '/morphableModel-2017.pickle'
+        pathPickleFileName = path + '/morphableModel-2017v2.pickle'
         pathNormals = path + '/normals.pickle'
 
         if os.path.exists(pathPickleFileName) == False:
@@ -47,12 +47,22 @@ class MorphableModel:
 
             print("loading shape basis...")
             self.shapeMean = torch.Tensor(self.file["shape"]["model"]["mean"]).reshape(-1, 3).to(device).float()
-            self.shapePca = torch.Tensor(self.file["shape"]["model"]["pcaBasis"]).reshape(-1, 3, self.shapeBasisSize).to(device).float().permute(2, 0, 1)
-            self.shapePcaVar = torch.Tensor(self.file["shape"]["model"]["pcaVariance"]).reshape(self.shapeBasisSize).to(device).float()
+
+            shapePca = torch.Tensor(self.file["shape"]["model"]["pcaBasis"])
+            shapePcaVar = torch.Tensor(self.file["shape"]["model"]["pcaVariance"])
+            shapeBasis = shapePca * shapePcaVar.reshape(-1, self.shapeBasisSize)
+            #shapeBasis /= 1e5
+
+            self.shapePca = shapeBasis.reshape(-1, 3, self.shapeBasisSize).to(device).float().permute(2, 0, 1)
+            self.shapePcaVar = torch.ones_like(shapePcaVar).reshape(self.shapeBasisSize).to(device).float() # shapePcaVar.reshape(self.shapeBasisSize).to(device).float()
 
             print("loading expression basis...")
-            self.expressionPca = torch.Tensor(self.file["expression"]["model"]["pcaBasis"]).reshape(-1, 3, self.expBasisSize).to(device).float().permute(2, 0, 1)
-            self.expressionPcaVar = torch.Tensor(self.file["expression"]["model"]["pcaVariance"]).reshape(self.expBasisSize).to(device).float()
+            expressionPca = torch.Tensor(self.file["expression"]["model"]["pcaBasis"])
+            expressionPcaVar = torch.Tensor(self.file["expression"]["model"]["pcaVariance"])
+            expressionBasis = expressionPca * expressionPcaVar.reshape(-1, self.expBasisSize)
+            self.expressionPca = expressionBasis.reshape(-1, 3, self.expBasisSize).to(device).float().permute(2, 0, 1)
+            self.expressionPcaVar = torch.ones_like(expressionPcaVar).reshape(self.expBasisSize).to(device).float()  # torch.Tensor(self.file["expression"]["model"]["pcaVariance"]).reshape(self.expBasisSize).to(device).float()
+
             self.faces = torch.Tensor(np.transpose(self.file["shape"]["representer"]["cells"])).reshape(-1, 3).to(device).long()
             self.file.close()
 
@@ -65,12 +75,20 @@ class MorphableModel:
             assert(self.file is not None)
 
             self.diffuseAlbedoMean = torch.Tensor(self.file["diffuseAlbedo"]["model"]["mean"]).reshape(-1, 3).to(device).float()
-            self.diffuseAlbedoPca = torch.Tensor(self.file["diffuseAlbedo"]["model"]["pcaBasis"]).reshape(-1, 3, self.albedoBasisSize).to(device).float().permute(2, 0, 1)
-            self.diffuseAlbedoPcaVar = torch.Tensor(self.file["diffuseAlbedo"]["model"]["pcaVariance"]).reshape(self.albedoBasisSize).to(device).float()
+            diffuseAlbedoPca = torch.Tensor(self.file["diffuseAlbedo"]["model"]["pcaBasis"])
+            diffuseAlbedoPcaVar = torch.Tensor(self.file["diffuseAlbedo"]["model"]["pcaVariance"])
+            diffAlbedoBasis = diffuseAlbedoPca * diffuseAlbedoPcaVar.reshape(-1, self.albedoBasisSize)
+            self.diffuseAlbedoPca = diffAlbedoBasis.reshape(-1, 3, self.albedoBasisSize).to(device).float().permute(2, 0, 1)
+            self.diffuseAlbedoPcaVar = torch.ones_like(diffuseAlbedoPcaVar).reshape(self.albedoBasisSize).to(device).float() #torch.Tensor(self.file["diffuseAlbedo"]["model"]["pcaVariance"]).reshape(self.albedoBasisSize).to(device).float()
 
             self.specularAlbedoMean = torch.Tensor(self.file["specularAlbedo"]["model"]["mean"]).reshape(-1, 3).to(device).float()
-            self.specularAlbedoPca = torch.Tensor(self.file["specularAlbedo"]["model"]["pcaBasis"]).reshape(-1, 3, self.albedoBasisSize).to(device).float().permute(2, 0, 1)
-            self.specularAlbedoPcaVar = torch.Tensor(self.file["specularAlbedo"]["model"]["pcaVariance"]).reshape(self.albedoBasisSize).to(device).float()
+
+            specularAlbedoPca = torch.Tensor(self.file["specularAlbedo"]["model"]["pcaBasis"])
+            specularAlbedoPcaVar = torch.Tensor(self.file["specularAlbedo"]["model"]["pcaVariance"])
+            specAlbedoBasis = specularAlbedoPca * specularAlbedoPcaVar.reshape(-1, self.albedoBasisSize)
+
+            self.specularAlbedoPca = specAlbedoBasis.reshape(-1, 3, self.albedoBasisSize).to(device).float().permute(2, 0, 1)
+            self.specularAlbedoPcaVar = torch.ones_like(specularAlbedoPcaVar).reshape(self.albedoBasisSize).to(device).float()  #torch.Tensor(self.file["specularAlbedo"]["model"]["pcaVariance"]).reshape(self.albedoBasisSize).to(device).float()
             self.file.close()
 
             #save to pickle for future loading
@@ -110,28 +128,10 @@ class MorphableModel:
             self.expressionPcaVar = torch.tensor(dict['expressionPcaVar']).to(device)
             self.faces = torch.tensor(dict['faces']).to(device)
 
+        self.normalizePCA()
 
         if trimPca:
-            newDim = min(80,
-                         self.shapePca.shape[0],
-                         self.diffuseAlbedoPca.shape[0],
-                         self.specularAlbedoPcaVar.shape[0],
-                         self.expressionPca.shape[0])
-
-            self.shapePca = self.shapePca[0:newDim, ...]
-            self.shapePcaVar = self.shapePcaVar[0:newDim, ...]
-
-            self.diffuseAlbedoPca = self.diffuseAlbedoPca[0:newDim, ...]
-            self.diffuseAlbedoPcaVar = self.diffuseAlbedoPcaVar[0:newDim, ...]
-
-            self.specularAlbedoPca = self.specularAlbedoPca[0:newDim, ...]
-            self.specularAlbedoPcaVar = self.specularAlbedoPcaVar[0:newDim, ...]
-
-            self.expressionPca = self.expressionPca[0:newDim, ...]
-            self.expressionPcaVar = self.expressionPcaVar[0:newDim, ...]
-            self.shapeBasisSize = newDim
-            self.expBasisSize = newDim
-            self.albedoBasisSize = newDim
+            self.trimPCA()
 
         print("loading mesh normals...")
         dic = loadDictionaryFromPickle(pathNormals)
@@ -153,6 +153,30 @@ class MorphableModel:
         print('creating sampler...')
         self.sampler = NormalSampler(self)
 
+    def normalizePCA(self):
+        #self.shapePca * self.shapePcaVar
+        pass
+    def trimPCA(self):
+        newDim = min(80,
+                     self.shapePca.shape[0],
+                     self.diffuseAlbedoPca.shape[0],
+                     self.specularAlbedoPcaVar.shape[0],
+                     self.expressionPca.shape[0])
+
+        self.shapePca = self.shapePca[0:newDim, ...]
+        self.shapePcaVar = self.shapePcaVar[0:newDim, ...]
+
+        self.diffuseAlbedoPca = self.diffuseAlbedoPca[0:newDim, ...]
+        self.diffuseAlbedoPcaVar = self.diffuseAlbedoPcaVar[0:newDim, ...]
+
+        self.specularAlbedoPca = self.specularAlbedoPca[0:newDim, ...]
+        self.specularAlbedoPcaVar = self.specularAlbedoPcaVar[0:newDim, ...]
+
+        self.expressionPca = self.expressionPca[0:newDim, ...]
+        self.expressionPcaVar = self.expressionPcaVar[0:newDim, ...]
+        self.shapeBasisSize = newDim
+        self.expBasisSize = newDim
+        self.albedoBasisSize = newDim
     def generateTextureFromAlbedo(self, albedo):
         '''
         generate diffuse and specular textures from per vertex albedo color

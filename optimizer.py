@@ -161,7 +161,8 @@ class Optimizer:
             cv2.imwrite(outputPrefix  + '_frame' + str(i) + '.png', debugFrame)
 
     def regStatModel(self, coeff, var):
-        loss = ((coeff * coeff) / var).mean()
+        loss = coeff.pow(2).sum()
+        #loss = ((coeff * coeff) / var).mean()
         return loss
 
     def plotLoss(self, lossArr, index, fileName):
@@ -197,7 +198,7 @@ class Optimizer:
             vertices = self.pipeline.computeShape()
             cameraVertices = self.pipeline.transformVertices(vertices)
             loss = self.landmarkLoss(cameraVertices, self.landmarks)
-            loss += 0.1 * self.regStatModel(self.pipeline.vExpCoeff, self.pipeline.morphableModel.expressionPcaVar)
+            loss += 100.0 * self.regStatModel(self.pipeline.vExpCoeff, self.pipeline.morphableModel.expressionPcaVar)
             loss.backward()
             optimizer.step()
             losses.append(loss.item())
@@ -216,7 +217,7 @@ class Optimizer:
         optimizer = torch.optim.Adam([
             {'params': self.pipeline.vShCoeffs, 'lr': 0.005},
             {'params': self.pipeline.vShapeCoeff, 'lr': 0.01},
-            {'params': self.pipeline.vAlbedoCoeff, 'lr': 0.007},
+            {'params': self.pipeline.vAlbedoCoeff, 'lr': 0.01},
             {'params': self.pipeline.vExpCoeff, 'lr': 0.01},
             {'params': self.pipeline.vRotation, 'lr': 0.001},
             {'params': self.pipeline.vTranslation, 'lr': 0.001}
@@ -235,7 +236,7 @@ class Optimizer:
             smoothedImage = smoothImage(images[..., 0:3], self.smoothing)
             diff = mask * (smoothedImage - inputTensor).abs()
             #photoLoss =  diff.mean(dim=-1).sum() / float(self.framesNumber)
-            photoLoss = 1000.* diff.mean()
+            photoLoss =  diff.mean()
             landmarksLoss = self.config.weightLandmarksLossStep2 *  self.landmarkLoss(cameraVerts, self.landmarks)
 
             regLoss = 0.0001 * self.pipeline.vShCoeffs.pow(2).mean()
@@ -301,8 +302,8 @@ class Optimizer:
             diff = mask * (smoothedImage - inputTensor).abs()
 
             #loss =  diff.mean(dim=-1).sum() / float(self.framesNumber)
-            loss = 1000.0 * diff.mean()
-            loss += 0.2 * (self.textureLoss.regTextures(vDiffTextures, refDiffTextures, ws = self.config.weightDiffuseSymmetryReg, wr =  self.config.weightDiffuseConsistencyReg, wc = self.config.weightDiffuseConsistencyReg, wsm = self.config.weightDiffuseSmoothnessReg, wm = 0.) + \
+            loss = diff.mean()
+            loss += 0.00005 * (self.textureLoss.regTextures(vDiffTextures, refDiffTextures, ws = self.config.weightDiffuseSymmetryReg, wr =  self.config.weightDiffuseConsistencyReg, wc = self.config.weightDiffuseConsistencyReg, wsm = self.config.weightDiffuseSmoothnessReg, wm = 0.) + \
                     self.textureLoss.regTextures(vSpecTextures, refSpecTextures, ws = self.config.weightSpecularSymmetryReg, wr = self.config.weightSpecularConsistencyReg, wc = self.config.weightSpecularConsistencyReg, wsm = self.config.weightSpecularSmoothnessReg, wm = 0.5) + \
                     self.textureLoss.regTextures(vRoughTextures, refRoughTextures, ws = self.config.weightRoughnessSymmetryReg, wr = self.config.weightRoughnessConsistencyReg, wc = self.config.weightRoughnessConsistencyReg, wsm = self.config.weightRoughnessSmoothnessReg, wm = 0.))
             loss += 0.0001 * self.pipeline.vShCoeffs.pow(2).mean()
