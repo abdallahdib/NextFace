@@ -2,6 +2,16 @@
 NextFace is a light-weight pytorch library for high-fidelity 3D face reconstruction from monocular image(s) where scene attributes –3D geometry, reflectance (diffuse, specular and roughness), pose, camera parameters, and scene illumination– are estimated. It is a first-order optimization method that uses pytorch autograd engine and ray tracing to fit a statistical morphable model to an input image(s).
 <p align="center"><img src="resources/emily.png" style="float: left; width: 24%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/emily.gif" style="float: left; width: 24%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/beard.png" style="float: left; width: 24%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/beard.gif" style="float: left; width: 24%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/visual.jpg" ></p>
 
+<p align="center">
+A demo on youtube from here:
+</p>
+<p align="center">
+<a href="http://www.youtube.com/watch?v=bPFp0oZ9plg" title="Practical Face Reconstruction via Differentiable Ray Tracing"><img src="http://img.youtube.com/vi/bPFp0oZ9plg/0.jpg" alt="Practical Face Reconstruction via Differentiable Ray Tracing" /></a>
+</p>
+
+
+
+
 # News 
 * **01 May 2022**: i you want to generate an animation like the one of the gif files in the readme that rotates the reconstruction on the vertical axis, plz run the replay.py script and give it the path of the pickle file that contains the optimized scene attributes ( located in  checkpoints/stage3_output.pickle). 
 * **26 April 2022**: I added export of the estimated light map (as an environment map). this can be useful if you want to render the face with other rendering engines (Unreal, Unity, OpenGL). plz pull the code. U can choose to export the lightmap as png or exr (check optimConfig.ini)
