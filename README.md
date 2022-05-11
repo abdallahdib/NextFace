@@ -3,7 +3,7 @@ NextFace is a light-weight pytorch library for high-fidelity 3D face reconstruct
 <p align="center"><img src="resources/emily.png" style="float: left; width: 24%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/emily.gif" style="float: left; width: 24%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/beard.png" style="float: left; width: 24%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/beard.gif" style="float: left; width: 24%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/visual.jpg" ></p>
 
 <p align="center">
-A demo on youtube from here:
+<strong>A demo on youtube from here:</strong>
 </p>
 <p align="center">
 <a href="http://www.youtube.com/watch?v=bPFp0oZ9plg" title="Practical Face Reconstruction via Differentiable Ray Tracing"><img src="http://img.youtube.com/vi/bPFp0oZ9plg/0.jpg" alt="Practical Face Reconstruction via Differentiable Ray Tracing" /></a>
