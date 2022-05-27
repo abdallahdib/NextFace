@@ -1,6 +1,6 @@
 # NextFace
 NextFace is a light-weight pytorch library for high-fidelity 3D face reconstruction from monocular image(s) where scene attributes –3D geometry, reflectance (diffuse, specular and roughness), pose, camera parameters, and scene illumination– are estimated. It is a first-order optimization method that uses pytorch autograd engine and ray tracing to fit a statistical morphable model to an input image(s).
-<p align="center"><img src="resources/emily.png" style="float: left; width: 24%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/emily.gif" style="float: left; width: 24%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/beard.png" style="float: left; width: 24%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/beard.gif" style="float: left; width: 24%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/visual.jpg" ></p>
+<p align="center"><img src="resources/emily.png" style="float: left; width: 23%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/emily.gif" style="float: left; width: 23%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/beard.png" style="float: left; width: 23%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/beard.gif" style="float: left; width: 23%; margin-right: 1%; margin-bottom: 0.5em;"><img src="resources/visual.jpg" ></p>
 
 <p align="center">
 <strong>A demo on youtube from here:</strong>
