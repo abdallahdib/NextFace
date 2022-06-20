@@ -93,3 +93,4 @@ xz=5.2.5=h62dcd97_0
 yaml=0.2.5=he774522_0
 zlib=1.2.11=hbd8134f_5
 zstd=1.4.9=h19a0ad4_0
+mediapipe=0.8.3

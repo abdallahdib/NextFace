@@ -13,12 +13,14 @@ class Pipeline:
         '''
         self.config = config
         self.device = config.device
+        self.tracker = config.tracker
         self.camera = Camera(self.device)
         self.sh = SphericalHarmonics(config.envMapRes, self.device)
         self.morphableModel = MorphableModel(path = config.path,
                                              textureResolution= config.textureResolution,
                                              trimPca= config.trimPca,
-                                             device = self.device)
+                                             device = self.device,
+                                             tracker = self.tracker)
         self.renderer = Renderer(config.rtTrainingSamples, 1, self.device)
         self.uvMap = self.morphableModel.uvMap.clone()
         self.uvMap[:, 1] = 1.0 - self.uvMap[:, 1]

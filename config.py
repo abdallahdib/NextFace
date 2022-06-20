@@ -7,6 +7,9 @@ class Config:
 		#compute device
 		self.device = 'cuda'
 
+		#tracker
+		self.tracker = 'mediapipe'  # Options ['mediapipe', 'fan']
+
 		#morphable model
 		self.path = 'baselMorphableModel'
 		self.textureResolution = 256 #256 or 512

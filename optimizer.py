@@ -1,7 +1,7 @@
 from image import Image, ImageFolder, overlayImage, saveImage
 from gaussiansmoothing import GaussianSmoothing, smoothImage
 from projection import estimateCameraPosition
-from landmarks import LandmarksDetector
+from landmarks import LandmarksDetectorFAN, LandmarksDetectorMediapipe
 from textureloss import TextureLoss
 from pipeline import Pipeline
 from config import Config
@@ -19,7 +19,8 @@ class Optimizer:
         self.verbose = config.verbose
         self.framesNumber = 0
         self.pipeline = Pipeline(self.config)
-        self.landmarksDetector = LandmarksDetector(self.pipeline.morphableModel.landmarksMask, self.device)
+        # self.landmarksDetector = LandmarksDetectorFAN(self.pipeline.morphableModel.landmarksMask, self.device)
+        self.landmarksDetector = LandmarksDetectorMediapipe(self.pipeline.morphableModel.landmarksMask, self.device)
         self.textureLoss = TextureLoss(self.device)
 
         self.inputImage = None

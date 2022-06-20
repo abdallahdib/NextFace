@@ -9,7 +9,7 @@ import os
 
 class MorphableModel:
 
-    def __init__(self, path, textureResolution = 256, trimPca = False, device='cuda'):
+    def __init__(self, path, textureResolution = 256, trimPca = False, device='cuda', tracker='mediapipe'):
         '''
         a statistical morphable model is a generative model that can generate faces with different identity, expression and skin reflectance
         it is mainly composed of an orthogonal basis (eigen vectors) obtained from applying principal component analysis (PCA) on a set of face scans.
@@ -28,7 +28,14 @@ class MorphableModel:
         pathAlbedoModel = path + '/albedoModel2020_face12_albedoPart.h5'
         pathUV = path + '/uvParametrization.' + str(textureResolution) + '.pickle'
         #landmarks association file only 54 or 62 are available. 68 can improve
-        pathLandmarks = path + '/landmark_62.txt'
+
+        if tracker == 'mediapipe':
+            pathLandmarks = path + '/landmark_62_mp.txt'
+        elif tracker == 'fan':
+            pathLandmarks = path + '/landmark_mp.txt'
+        else:
+            raise ValueError(f'Tracker must be one of [mediapipe, fan] but was {tracker}')
+
         #pathLandmarks = path + '/landmark_54.txt'
         pathPickleFileName = path + '/morphableModel-2017.pickle'
         pathNormals = path + '/normals.pickle'
