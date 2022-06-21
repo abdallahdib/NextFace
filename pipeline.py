@@ -13,14 +13,22 @@ class Pipeline:
         '''
         self.config = config
         self.device = config.device
-        self.tracker = config.tracker
         self.camera = Camera(self.device)
         self.sh = SphericalHarmonics(config.envMapRes, self.device)
+
+        if self.config.lamdmarksDetectorType == 'fan':
+            pathLandmarksAssociation = '/landmark_62.txt'
+        elif self.config.lamdmarksDetectorType == 'mediapipe':
+            pathLandmarksAssociation = '/landmark_62_mp.txt'
+        else:
+            raise ValueError(f'lamdmarksDetectorType must be one of [mediapipe, fan] but was {self.config.lamdmarksDetectorType}')
+
         self.morphableModel = MorphableModel(path = config.path,
                                              textureResolution= config.textureResolution,
                                              trimPca= config.trimPca,
-                                             device = self.device,
-                                             tracker = self.tracker)
+                                             landmarksPathName=pathLandmarksAssociation,
+                                             device = self.device
+                                             )
         self.renderer = Renderer(config.rtTrainingSamples, 1, self.device)
         self.uvMap = self.morphableModel.uvMap.clone()
         self.uvMap[:, 1] = 1.0 - self.uvMap[:, 1]

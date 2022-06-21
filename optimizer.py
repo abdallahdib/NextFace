@@ -1,7 +1,7 @@
 from image import Image, ImageFolder, overlayImage, saveImage
 from gaussiansmoothing import GaussianSmoothing, smoothImage
 from projection import estimateCameraPosition
-from landmarks import LandmarksDetectorFAN, LandmarksDetectorMediapipe
+
 from textureloss import TextureLoss
 from pipeline import Pipeline
 from config import Config
@@ -19,8 +19,16 @@ class Optimizer:
         self.verbose = config.verbose
         self.framesNumber = 0
         self.pipeline = Pipeline(self.config)
-        # self.landmarksDetector = LandmarksDetectorFAN(self.pipeline.morphableModel.landmarksMask, self.device)
-        self.landmarksDetector = LandmarksDetectorMediapipe(self.pipeline.morphableModel.landmarksMask, self.device)
+
+        if self.config.lamdmarksDetectorType == 'fan':
+            from landmarksfan import LandmarksDetectorFAN
+            self.landmarksDetector = LandmarksDetectorFAN(self.pipeline.morphableModel.landmarksMask, self.device)
+        elif self.config.lamdmarksDetectorType == 'mediapipe':
+            from landmarksmediapipe import LandmarksDetectorMediapipe
+            self.landmarksDetector = LandmarksDetectorMediapipe(self.pipeline.morphableModel.landmarksMask, self.device)
+        else:
+            raise ValueError(f'lamdmarksDetectorType must be one of [mediapipe, fan] but was {self.config.lamdmarksDetectorType}')
+
         self.textureLoss = TextureLoss(self.device)
 
         self.inputImage = None
@@ -116,7 +124,7 @@ class Optimizer:
         self.pipeline.renderer.screenWidth = self.inputImage.width
         self.pipeline.renderer.screenHeight = self.inputImage.height
 
-        print('detecting landmarks...')
+        print('detecting landmarks using:', self.config.lamdmarksDetectorType)
         landmarks = self.landmarksDetector.detect(self.inputImage.tensor)
         #assert (landmarks.shape[0] == 1)  # can only handle single subject in image
         assert (landmarks.dim() == 3 and landmarks.shape[2] == 2)
@@ -462,8 +470,17 @@ if __name__ == "__main__":
     config = Config()
     config.fillFromDicFile(configFile)
     if config.device == 'cuda' and torch.cuda.is_available() == False:
-        print('no cuda enabled device found. switching to cpu... ')
+        print('[WARN] no cuda enabled device found. switching to cpu... ')
         config.device = 'cpu'
+
+    #check if mediapipe is available
+
+    if config.lamdmarksDetectorType == 'mediapipe':
+        try:
+            from  landmarksmediapipe import LandmarksDetectorMediapipe
+        except:
+            print('[WARN] Mediapipe for landmarks detection not availble. falling back to FAN landmarks detector. You may want to try Mediapipe because it is much accurate than FAN (pip install mediapipe)')
+            config.lamdmarksDetectorType = 'fan'
 
     optimizer = Optimizer(outputDir, config)
     optimizer.run(inputDir,

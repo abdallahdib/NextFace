@@ -8,7 +8,7 @@ class Config:
 		self.device = 'cuda'
 
 		#tracker
-		self.tracker = 'mediapipe'  # Options ['mediapipe', 'fan']
+		self.lamdmarksDetectorType = 'mediapipe'  # Options ['mediapipe', 'fan']
 
 		#morphable model
 		self.path = 'baselMorphableModel'
