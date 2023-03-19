@@ -133,8 +133,8 @@ class Optimizer:
             imagesLandmark = self.landmarksDetector.drawLandmarks(self.inputImage.tensor[i], self.landmarks[i])
             cv2.imwrite(self.outputDir  + '/landmarks' + str(i) + '.png', cv2.cvtColor(imagesLandmark, cv2.COLOR_BGR2RGB) )
         self.pipeline.initSceneParameters(self.framesNumber, sharedIdentity)
-        self.enableGrad()
         self.initCameraPos() #always init the head pose (rotation + translation)
+        self.enableGrad()
 
     def initCameraPos(self):
         print('init camera pose...', file=sys.stderr, flush=True)
@@ -224,15 +224,17 @@ class Optimizer:
 
         optimizer = torch.optim.Adam([
             {'params': self.pipeline.vShCoeffs, 'lr': 0.005},
-            {'params': self.pipeline.vShapeCoeff, 'lr': 0.01},
-            {'params': self.pipeline.vAlbedoCoeff, 'lr': 0.007},
-            {'params': self.pipeline.vExpCoeff, 'lr': 0.01},
-            {'params': self.pipeline.vRotation, 'lr': 0.001},
-            {'params': self.pipeline.vTranslation, 'lr': 0.001}
+            {'params': self.pipeline.vAlbedoCoeff, 'lr': 0.007}
         ])
         losses = []
 
         for iter in tqdm.tqdm(range(self.config.iterStep2 + 1)):
+            if iter == 100:
+                optimizer.add_param_group({'params': self.pipeline.vShapeCoeff, 'lr': 0.01})
+                optimizer.add_param_group({'params': self.pipeline.vExpCoeff, 'lr': 0.01})
+                optimizer.add_param_group({'params': self.pipeline.vRotation, 'lr': 0.0001})
+                optimizer.add_param_group({'params': self.pipeline.vTranslation, 'lr': 0.0001})
+
             optimizer.zero_grad()
             vertices, diffAlbedo, specAlbedo = self.pipeline.morphableModel.computeShapeAlbedo(self.pipeline.vShapeCoeff, self.pipeline.vExpCoeff, self.pipeline.vAlbedoCoeff)
             cameraVerts = self.pipeline.camera.transformVertices(vertices, self.pipeline.vTranslation, self.pipeline.vRotation)
@@ -288,15 +290,17 @@ class Optimizer:
         vRoughTextures.requires_grad = True
 
         optimizer = torch.optim.Adam([
-            {'params': self.pipeline.vShCoeffs, 'lr': 0.005 * 2.},
-            {'params': vDiffTextures, 'lr': 0.005 },
+            {'params': vDiffTextures, 'lr': 0.005},
             {'params': vSpecTextures, 'lr': 0.02},
-            {'params': vRoughTextures, 'lr': 0.02},
-            {'params': self.pipeline.vShapeCoeff, 'lr': 0.01},
-            {'params': self.pipeline.vExpCoeff, 'lr': 0.01},
-            {'params': self.pipeline.vRotation, 'lr': 0.0005},
-            {'params': self.pipeline.vTranslation, 'lr': 0.0005}
+            {'params': vRoughTextures, 'lr': 0.02}
         ])
+        ''''
+        {'params': self.pipeline.vShCoeffs, 'lr': 0.005 * 2.},
+        {'params': self.pipeline.vShapeCoeff, 'lr': 0.01},
+        {'params': self.pipeline.vExpCoeff, 'lr': 0.01},
+        {'params': self.pipeline.vRotation, 'lr': 0.0005},
+        {'params': self.pipeline.vTranslation, 'lr': 0.0005}'''
+
         losses = []
 
         for iter in tqdm.tqdm(range(self.config.iterStep3 + 1)):
