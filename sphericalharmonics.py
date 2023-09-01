@@ -107,3 +107,28 @@ class SphericalHarmonics:
                 i += 1
         result = torch.max(result, torch.zeros(res[0], res[1], smoothed_coeffs.shape[0], device=smoothed_coeffs.device))
         return result
+
+    def preComputeSHBasisFunction(self, normals, sh_order):
+        """we need a matrix that holds all sh basis function  for our order, it is expensive computations so we save it in this class before
+
+        Args:
+            normals ([B, N, 3] tensor): holds the current normals 
+            sh_order (int): order of the sh that we are using in our system
+
+        Returns:
+            [B, N, (sh_order +1)^2 ]: functions used with vSHCoeffs to get a better color approximation
+        """
+        numCoeffs = (sh_order + 1) ** 2  # Calculate the number of SH coefficients
+        # Pre-allocate the tensor to hold SH basis
+        Y = torch.empty((normals.shape[0], normals.shape[1], numCoeffs), device=normals.device)
+        theta = torch.acos(normals[..., 2:]).squeeze()
+        phi = torch.atan2(normals[..., 1:2], normals[..., :1]).squeeze()
+        # Compute SH basis for each l, m and normal
+        element = 0
+        for l in range(sh_order+1):
+            for m in range(-l, l + 1):
+                Y_l_m = self.SH(l, m, theta, phi)
+                Y[..., element] = Y_l_m.squeeze()
+                element += 1
+        self.Y = Y
+        return Y

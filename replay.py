@@ -1,5 +1,3 @@
-from _nsis import out
-
 from optimizer import Optimizer
 from config import Config
 from utils import *
@@ -10,7 +8,7 @@ frameIndex = 0
 outputDir = './out'
 def produce(optimizer):
     global frameIndex
-    images = optimizer.pipeline.render(None, optimizer.vEnhancedDiffuse, optimizer.vEnhancedSpecular, optimizer.vEnhancedRoughness)
+    images = optimizer.pipeline.render(None, diffuseTextures=optimizer.vEnhancedDiffuse,specularTextures= optimizer.vEnhancedSpecular,roughnessTextures=optimizer.vEnhancedRoughness)
     for i in range(images.shape[0]):
         fileName = outputDir + '/frame_' + str(i)+ '_%04d.png' % frameIndex
         saveImage(images[i], fileName)
@@ -47,6 +45,7 @@ if __name__ == "__main__":
     config.fillFromDicFile(configFile)
     optimizer = Optimizer(outputDir, config)
     optimizer.pipeline.renderer.samples = config.rtSamples
+    optimizer.pipeline.initSceneParameters(1)
     optimizer.loadParameters(parameters)
 
     DTR = math.pi / 180.0

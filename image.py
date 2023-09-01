@@ -4,7 +4,8 @@ import numpy as np
 import torch
 import cv2
 import os
-
+from PIL import Image
+import torchvision
 
 def saveImage(image, fileName, gamma = 2.2):
     '''
@@ -14,10 +15,14 @@ def saveImage(image, fileName, gamma = 2.2):
     :param gamma: gamma correction
     :return:
     '''
-
-    import pyredner
-    pyredner.imwrite(image.cpu().detach(), fileName, gamma = gamma)
-
+    print(f"{fileName} = {image.shape}1")
+    if ".exr" in fileName:
+        print(f"IGNORE SAVING: {fileName}")
+    else:
+        image = image.permute(2, 0, 1) # Need to permute
+        image = torch.pow(image, 1.0/gamma) # gamma correction
+        torchvision.utils.save_image(image.cpu().detach(), fileName) 
+        
 def overlayImage(background, image):
     '''
     overlay image on top of background image an image on a background image.
@@ -56,30 +61,34 @@ def resizeImage(image, targetResolution):
 
 class Image:
 
-    def __init__(self, path, device, maxRes = 512):
+    def __init__(self, path, device, maxRes):
         '''
-        class that represent a single image  as a pytorch tensor [1, h, w, channels]
-        :param path: the path to the image
-        :param device: where to store the image ('cpu' or 'cuda')
-        :param maxRes: maximum allowed resolution (depending on the gpu/cpu memory and speed, this limit can be increased or removed)
+        Class that represents a single image as a PyTorch tensor [1, h, w, channels].
+        :param path: The path to the image
+        :param device: Where to store the image ('cpu' or 'cuda')
+        :param maxRes: Maximum allowed resolution (depending on the GPU/CPU memory and speed, this limit can be increased or removed)
+        this should match no matter the resolution to the wanted resolution
         '''
         assert(maxRes > 0)
-        print('loading image from path: ', path)
+        print('loading image from path:', path)
         self.device = device
         numpyImage = cv2.imread(path)[..., 0:3]
         assert (numpyImage is not None)
-        numpyImage = resizeImage(cv2.cvtColor(numpyImage, cv2.COLOR_BGR2RGB), int(maxRes))
+        
+        # Resize the image to maxRes x maxRes
+        numpyImage = cv2.resize(cv2.cvtColor(numpyImage, cv2.COLOR_BGR2RGB), (maxRes, maxRes))
+
         self.tensor = (torch.from_numpy(numpyImage).to(self.device).to(dtype=torch.float32) / 255.0).unsqueeze(0)
-        self.height = numpyImage.shape[0]
-        self.width = numpyImage.shape[1]
+        self.height = maxRes
+        self.width = maxRes
         self.channels = numpyImage.shape[2]
         self.gamma = 2.2
-        self.center = torch.tensor([ self.width / 2, self.height / 2], dtype = torch.float32, device = self.device).reshape(1, -1)
+        self.center = torch.tensor([self.width / 2, self.height / 2], dtype=torch.float32, device=self.device).reshape(1, -1)
         self.imageName = os.path.basename(path)
 
 class ImageFolder:
 
-    def __init__(self, path, device, maxRes = 512):
+    def __init__(self, path, device, maxRes = 256):
         '''
         class that represent images in a given path
         :param path: the path to the image

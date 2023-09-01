@@ -122,3 +122,135 @@ def writeDictionaryToPickle(dict, picklePath):
     handle = open(picklePath, 'wb')
     pickle.dump(dict, handle, pickle.HIGHEST_PROTOCOL)
     handle.close()
+    
+def debugRender(image, outputPrefix):
+    """generate a single render of the current step
+
+    Args:
+        image ([B, X, Y, 3]): input
+        outputPrefix (string): path of the output folder
+    """
+    for i in range(image.shape[0]):
+        res = cv2.hconcat([cv2.cvtColor(image[i].detach().cpu().numpy(), cv2.COLOR_BGR2RGB)])
+        
+        # Concatenate vertically - combined image with textures 
+        debugFrame = cv2.vconcat([np.power(np.clip(res, 0.0, 1.0), 1.0 / 2.2) * 255])
+        
+        cv2.imwrite(outputPrefix  + '.png', debugFrame)
+        
+def debugIteration(image, target, diff, diffuseOnlyVertexRender, lightingOnlyVertexRender, outputPrefix):
+    """render a vertex debug picture to see how an iteration looks like
+
+    Args:
+        image ([1, width, height, 3] tensor): final render
+        target ([1, width, height, 3] tensor): input picture
+        diff ( [1, width, height, 3] tensor): difference between image and target
+        diffuseOnlyVertexRender ( [1, width, height, 4] tensor): render but only with the diffuse Albedo 
+        lightingOnlyVertexRender ( [1, width, height, 4] tensor): render but only with the SH 
+        outputPrefix (string): where we save the files
+    """
+    # Converting tensors to numpy arrays
+    image = image.squeeze(0).detach().cpu().numpy()
+    target = target.squeeze(0).detach().cpu().numpy()
+    diff = diff.squeeze(0).detach().cpu().numpy()
+    diffuseOnlyVertexRender = diffuseOnlyVertexRender[..., :3].squeeze(0).detach().cpu().numpy()
+    lightingOnlyVertexRender = lightingOnlyVertexRender[..., :3].squeeze(0).detach().cpu().numpy()
+
+
+    # # Adjust colors and clamp
+    image = np.power(np.clip(image, 0.0, 1.0), 1.0 / 2.2)
+    target = np.clip(target, 0.0, 1.0)
+    diff = np.clip(diff, 0.0, 1.0)
+    diffuseOnlyVertexRender = np.clip(diffuseOnlyVertexRender, 0.0, 1.0)
+    lightingOnlyVertexRender = np.clip(lightingOnlyVertexRender, 0.0, 1.0)
+
+    # OpenCV assumes images to be in BGR format. Convert RGB to BGR
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    target = cv2.cvtColor(target, cv2.COLOR_BGR2RGB)
+    diff = cv2.cvtColor(diff, cv2.COLOR_BGR2RGB)
+    diffuseOnlyVertexRender = cv2.cvtColor(diffuseOnlyVertexRender, cv2.COLOR_BGR2RGB)
+    lightingOnlyVertexRender = cv2.cvtColor(lightingOnlyVertexRender, cv2.COLOR_BGR2RGB)
+
+    # Concatenate images horizontally and vertically
+    res = cv2.hconcat([image, target, diff])
+    ref = cv2.hconcat([diffuseOnlyVertexRender, lightingOnlyVertexRender])
+    # add a black padding so that ref matches size of res (res is 3 pictures ref is 2)
+    if ref.shape[1] < res.shape[1]:
+        pad_width = res.shape[1] - ref.shape[1]
+        padding = np.zeros((ref.shape[0], pad_width, ref.shape[2]), dtype=np.float32)
+        ref = cv2.hconcat([ref, padding])
+    res = np.power(np.clip(res, 0.0, 1.0), 1.0 / 2.2) * 255
+    ref = np.power(np.clip(ref, 0.0, 1.0), 1.0 / 2.2) * 255
+    debugFrame = cv2.vconcat([res, ref])
+
+    # Save the image
+    cv2.imwrite(outputPrefix + '.png', debugFrame)
+    
+def debugTensor(debugTensor):
+    """display a tensor of shape [x, y, 3]
+
+    Args:
+        debugTensor (_type_): _description_
+    """
+    import matplotlib.pyplot as plt
+
+    # Convert your tensor to a numpy array. If your tensor is on the GPU, bring it back to CPU first
+    debugTensor = debugTensor.detach().cpu().numpy()
+
+    # Convert the mask to a 2D array if it is not already
+    if len(debugTensor.shape) > 2:
+        debugTensor = debugTensor.mean(axis=-1)
+
+    # Display the mask
+    plt.imshow(debugTensor)
+    plt.colorbar(label='debugTensor')
+    plt.show()
+    
+def screenshotMesh(names, meshDir, outputDir):
+    #  display meshes in polyscope
+    import polyscope as ps
+    import trimesh
+    import glob
+
+    # display_meshes = ["mitsuba_step2_iter0.obj","mitsuba_step2_iter400.obj","redner_step2_iter0.obj","redner_step2_iter400.obj","vertex_step2_iter0.obj","vertex_step2_iter400.obj",]  # replace this with your mesh names
+
+    # outputDir = './output/test/bikerman_512.jpg/'
+    # Get a list of all .obj files in the directory
+    # obj_files = glob.glob(os.path.join(outputDir + '/debug/mesh', "*.obj"))
+    obj_files = glob.glob(os.path.join(meshDir, "*.obj"))
+
+    # Filter obj_files to only include the ones in display_meshes
+    obj_files = [file for file in obj_files if os.path.basename(file) in names]
+
+    # Define a folder where the screenshots will be saved
+    # Check if the folder exists, if not create it
+    os.makedirs(outputDir, exist_ok=True)
+
+    # Initialize polyscope
+    ps.init()
+    ps.set_up_dir("neg_y_up")
+    ps.set_ground_plane_mode("none")
+
+    # # Show the mesh
+    # Load and register each mesh to polyscope
+    for idx, obj_file in enumerate(obj_files):
+        # mesh_name = os.path.basename(obj_file)  # get the name of the mesh
+        mesh_name = os.path.basename(obj_file)  # get the name of the mesh
+        # Load the mesh from an obj file using trimesh
+        mesh = trimesh.load_mesh(obj_file)
+        # Register the mesh to polyscope
+        ps_mesh = ps.register_surface_mesh(mesh_name, mesh.vertices, mesh.faces)
+        # Reset the transformation on the mesh
+        ps_mesh.reset_transform()
+        # Set a color for the mesh
+        color = torch.tensor([0.5, 0.5, 0.5]).numpy()  # set a fixed color
+        ps_mesh.set_color(color)
+        # Reset the view
+        ps.reset_camera_to_home_view()
+        # Show the mesh
+        ps.show()
+        # Take a screenshot and save it to the specified folder
+        screenshot_name = os.path.join(outputDir, f"{mesh_name}_screenshot.png")
+        ps.screenshot(screenshot_name)
+        # Remove the mesh from polyscope to prepare for the next one
+        ps.remove_all_structures()

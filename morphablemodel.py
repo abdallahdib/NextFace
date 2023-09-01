@@ -6,7 +6,6 @@ import torch
 import h5py
 import sys
 import os
-
 class MorphableModel:
 
     def __init__(self, path, textureResolution = 256, trimPca = False, landmarksPathName = 'landmark_62_mp.txt', device='cuda'):
@@ -147,8 +146,8 @@ class MorphableModel:
         self.uvMap = self.uvParametrization['uvVertices'].to(device)
 
         print("loading landmarks association file...")
-        self.landmarksAssociation = torch.tensor(np.loadtxt(pathLandmarks, delimiter='\t\t')[:, 1].astype(np.int64)).to(device)
-        self.landmarksMask = torch.tensor(np.loadtxt(pathLandmarks, delimiter='\t\t')[:, 0].astype(np.int64)).to(device)
+        self.landmarksAssociation = torch.tensor(np.genfromtxt(pathLandmarks, delimiter='\t\t')[:, 1].astype(np.int64)).to(device)
+        self.landmarksMask = torch.tensor(np.genfromtxt(pathLandmarks, delimiter='\t\t')[:, 0].astype(np.int64)).to(device)
 
         print('creating sampler...')
         self.sampler = NormalSampler(self)
@@ -188,7 +187,7 @@ class MorphableModel:
         :param expCoff: [n, self.expBasisSize]
         :return: return vertices tensor [n, verticesNumber, 3]
         '''
-        assert (shapeCoff.dim() == 2 and shapeCoff.shape[1] == self.shapeBasisSize)
+        assert (shapeCoff.ndim == 2 and shapeCoff.shape[1] == self.shapeBasisSize)
         assert (expCoff.dim() == 2 and expCoff.shape[1] == self.expBasisSize)
 
         vertices = self.shapeMean + torch.einsum('ni,ijk->njk', (shapeCoff, self.shapePca)) + torch.einsum('ni,ijk->njk', (expCoff, self.expressionPca))

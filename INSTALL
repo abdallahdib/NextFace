@@ -6,3 +6,4 @@ conda install -c conda-forge opencv
 conda install -c 1adrianb face_alignment=1.2.0
 conda install -c anaconda h5py
 pip install mediapipe
+pip install mitsuba
