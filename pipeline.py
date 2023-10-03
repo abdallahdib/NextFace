@@ -1,12 +1,12 @@
+from renderers.renderer import *
 from sphericalharmonics import SphericalHarmonics
 from morphablemodel import MorphableModel
-from renderer import Renderer
 from camera import Camera
 from utils import *
 
 class Pipeline:
 
-    def __init__(self,  config):
+    def __init__(self,  config, rendererName = ''):
         '''
         a pipeline can generate and render textured faces under different camera angles and lighting conditions
         :param config: configuration file used to parameterize the pipeline
@@ -29,7 +29,7 @@ class Pipeline:
                                              landmarksPathName=pathLandmarksAssociation,
                                              device = self.device
                                              )
-        self.renderer = Renderer(config.rtTrainingSamples, 1, self.device)
+        self.renderer = self.reloadRenderer(rendererName) 
         self.uvMap = self.morphableModel.uvMap.clone()
         self.uvMap[:, 1] = 1.0 - self.uvMap[:, 1]
         self.faces32 = self.morphableModel.faces.to(torch.int32).contiguous()
@@ -95,19 +95,17 @@ class Pipeline:
         transformedVertices = self.camera.transformVertices(vertices, self.vTranslation, self.vRotation)
         return transformedVertices
 
-    def render(self, cameraVerts = None, diffuseTextures = None, specularTextures = None, roughnessTextures = None, renderAlbedo = False):
-        '''
-        ray trace an image given camera vertices and corresponding textures
-        :param cameraVerts: camera vertices tensor [n, verticesNumber, 3]
-        :param diffuseTextures: diffuse textures tensor [n, texRes, texRes, 3]
-        :param specularTextures: specular textures tensor [n, texRes, texRes, 3]
-        :param roughnessTextures: roughness textures tensor [n, texRes, texRes, 1]
-        :param renderAlbedo: if True render albedo else ray trace image
-        :return: ray traced images [n, resX, resY, 4]
-        '''
+    # generic render method
+    def render(self, cameraVerts = None, diffAlbedo = None, specAlbedo = None, diffuseTextures = None, specularTextures = None, roughnessTextures = None,  renderAlbedo= False, lightingOnly=False):
+        
         if cameraVerts is None:
-            vertices, diffAlbedo, specAlbedo = self.morphableModel.computeShapeAlbedo(self.vShapeCoeff, self.vExpCoeff, self.vAlbedoCoeff)
+            vertices = self.morphableModel.computeShape(self.vShapeCoeff, self.vExpCoeff)
             cameraVerts = self.camera.transformVertices(vertices, self.vTranslation, self.vRotation)
+        if diffAlbedo is None :
+            diffAlbedo = self.morphableModel.computeDiffuseAlbedo(self.vAlbedoCoeff)
+        if specAlbedo is None:
+            specAlbedo = self.morphableModel.computeSpecularAlbedo( self.vAlbedoCoeff)
+
 
         #compute normals
         normals = self.morphableModel.meshNormals.computeNormals(cameraVerts)
@@ -121,24 +119,13 @@ class Pipeline:
         if roughnessTextures is None:
             roughnessTextures  = self.vRoughness
 
-        envMaps = self.sh.toEnvMap(self.vShCoeffs)
-
-        assert(envMaps.dim() == 4 and envMaps.shape[-1] == 3)
         assert (cameraVerts.dim() == 3 and cameraVerts.shape[-1] == 3)
         assert (diffuseTextures.dim() == 4 and diffuseTextures.shape[1] == diffuseTextures.shape[2] == self.morphableModel.getTextureResolution() and diffuseTextures.shape[-1] == 3)
         assert (specularTextures.dim() == 4 and specularTextures.shape[1] == specularTextures.shape[2] == self.morphableModel.getTextureResolution() and specularTextures.shape[-1] == 3)
         assert (roughnessTextures.dim() == 4 and roughnessTextures.shape[1] == roughnessTextures.shape[2] == self.morphableModel.getTextureResolution() and roughnessTextures.shape[-1] == 1)
-        assert(cameraVerts.shape[0] == envMaps.shape[0])
         assert (diffuseTextures.shape[0] == specularTextures.shape[0] == roughnessTextures.shape[0])
 
-        scenes = self.renderer.buildScenes(cameraVerts, self.faces32, normals, self.uvMap, diffuseTextures,
-                                           specularTextures, torch.clamp(roughnessTextures, 1e-20, 10.0), self.vFocals, envMaps)
-        if renderAlbedo:
-            images = self.renderer.renderAlbedo(scenes)
-        else:
-            images = self.renderer.render(scenes)
-
-        return images
+        return self.renderer.render(cameraVerts, self.faces32, normals, self.uvMap, diffAlbedo, torch.clamp(diffuseTextures, 1e-20, 1.0), torch.clamp(specularTextures, 1e-20, 1.0), torch.clamp(roughnessTextures, 1e-20, 10.0), self.vShCoeffs, self.sh, self.vFocals, renderAlbedo, lightingOnly)
 
     def landmarkLoss(self, cameraVertices, landmarks, focals, cameraCenters,  debugDir = None):
         '''
@@ -168,3 +155,22 @@ class Pipeline:
                 cv2.imwrite(debugDir + '/lp' +  str(i) +'.png', cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
         return loss
+        
+    def reloadRenderer(self, rendererName):
+        if rendererName == 'redner':
+            from renderers.rendererRedner import RendererRedner
+            self.renderer = RendererRedner(self.config.rtTrainingSamples, self.config.bounces, self.device, self.config.maxResolution, self.config.maxResolution)
+        elif rendererName == 'mitsuba':
+            from renderers.rendererMitsuba import RendererMitsuba
+            self.renderer = RendererMitsuba(self.config.rtTrainingSamples, self.config.bounces, self.device, self.config.maxResolution, self.config.maxResolution) 
+        elif rendererName == 'vertex':
+            from renderers.rendererVertexBased import RendererVertexBased
+            self.renderer = RendererVertexBased(self.device, self.config.maxResolution, self.config.maxResolution) 
+        else :
+            # check config file as last resort
+            rendererName == self.config.rendererName
+            if rendererName in ['redner','mitsuba','vertex'] :
+                self.reloadRenderer(rendererName)
+            else:
+                self.renderer = Renderer()
+                

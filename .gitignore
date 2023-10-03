@@ -1,0 +1,11 @@
+.vscode/settings.json
+__pycache__/*
+output/*
+input/*
+baselMorphableModel/*
+faceNext/*
+drjit/*
+mitsuba/*
+*.pyc
+ext/*
+chi2_data.py

@@ -9,7 +9,7 @@ def isRotationMatrix(R):
     """
     if R.ndim != 2 or R.shape[0] != R.shape[1]:
         return False
-    isIdentity = np.allclose(R.dot(R.T), np.identity(R.shape[0], np.float))
+    isIdentity = np.allclose(R.dot(R.T), np.identity(R.shape[0], float))
     isDetEqualToOne = np.allclose(np.linalg.det(R), 1)
     return isIdentity and isDetEqualToOne
 
